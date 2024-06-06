@@ -72,4 +72,21 @@ const show = async (req, res) => {
     }
 }
 
-module.exports = { store, index, show }
+const update = async (req, res) => {
+    try {
+        const { slug } = req.params;
+
+        const post = await prisma.post.update({
+            where: { slug },
+            data: req.body
+        });
+
+        res.json(post);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+}
+
+module.exports = { store, index, show, update }

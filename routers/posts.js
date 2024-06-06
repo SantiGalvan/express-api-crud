@@ -5,5 +5,6 @@ const postsController = require("../controllers/posts.js");
 router.post('/', postsController.store);
 router.get('/', postsController.index);
 router.get('/:slug', postsController.show);
+router.put('/:slug', postsController.update);
 
 module.exports = router;
