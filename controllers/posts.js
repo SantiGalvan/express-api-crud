@@ -35,4 +35,24 @@ const index = async (req, res) => {
     }
 }
 
-module.exports = { store, index }
+const show = async (req, res) => {
+    try {
+        const { slug } = req.params;
+
+        const post = await prisma.post.findUnique({
+            where: { slug }
+        });
+
+        if (post) {
+            res.json(post)
+        } else {
+            throw new Error(`Pizza con slug:${slug} non trovata`);
+        }
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+}
+
+module.exports = { store, index, show }
