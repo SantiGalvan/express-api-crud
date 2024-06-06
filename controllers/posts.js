@@ -26,7 +26,24 @@ const store = async (req, res) => {
 
 const index = async (req, res) => {
     try {
-        const posts = await prisma.post.findMany();
+        // Filtri
+        const where = {};
+        const { published, text } = req.query;
+
+        if (text) {
+            where.OR = [
+                { content: { contains: text } },
+                { title: { contains: text } }
+            ]
+        }
+
+        if (published === 'true') {
+            where.published = true;
+        } else if (published === 'false') {
+            where.published = false;
+        }
+
+        const posts = await prisma.post.findMany({ where });
         res.json(posts);
 
     } catch (err) {
