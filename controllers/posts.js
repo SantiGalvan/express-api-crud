@@ -1,6 +1,38 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const slugify = require("slugify");
 
-const store = async (req, res) => { }
+const store = async (req, res) => {
+    const { title, content } = req.body;
 
-module.exports = { store }
+    const slug = slugify(title);
+
+    const data = {
+        title,
+        slug,
+        image: req.body.image ? req.body.image : '',
+        content,
+        published: req.body.published ? true : false
+    }
+
+    try {
+        const post = await prisma.post.create({ data });
+        res.status(200).send(post);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+}
+
+const index = async (req, res) => {
+    try {
+        const posts = await prisma.post.findMany();
+        res.json(posts);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+}
+
+module.exports = { store, index }

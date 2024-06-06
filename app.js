@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000;
 const host = process.env.HOST || 'localhost';
 const postsRouter = require("./routers/posts.js");
 
-app.use(express.json);
+app.use(express.json());
 
 app.use('/posts', postsRouter);
 
