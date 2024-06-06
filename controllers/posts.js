@@ -26,10 +26,17 @@ const store = async (req, res) => {
 
 const index = async (req, res) => {
     try {
-        // Filtri
         const where = {};
-        const { published, text } = req.query;
+        const { published, text, page = 1, limit = 5 } = req.query;
 
+        // Paginazione
+        const offset = (page - 1) * limit;
+        const totalItems = await prisma.post.count({ where });
+        const totalPages = Math.ceil(totalItems / limit);
+
+        if (page > totalPages) throw new Error(`La pagina ${page} non esiste`);
+
+        // Filtri
         if (text) {
             where.OR = [
                 { content: { contains: text } },
@@ -43,8 +50,16 @@ const index = async (req, res) => {
             where.published = false;
         }
 
-        const posts = await prisma.post.findMany({ where });
-        res.json(posts);
+        const posts = await prisma.post.findMany({
+            where,
+            take: parseInt(limit),
+            skip: parseInt(offset)
+        });
+        res.json({
+            data: posts,
+            page,
+            totalPages
+        });
 
     } catch (err) {
         console.error(err);
